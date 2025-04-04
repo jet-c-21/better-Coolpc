@@ -15,6 +15,7 @@
 
 ## Files
 kite_tutorial.ipynb
+*.json
 
 
 # Byte-compiled / optimized / DLL files
