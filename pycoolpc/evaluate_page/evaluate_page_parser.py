@@ -12,7 +12,7 @@ import requests
 from pyquery import PyQuery
 from pyquery import PyQuery as pq
 
-from pycoolpc.item import Item
+from pycoolpc.evaluate_page.data import ItemData
 
 
 class EvaluatePageParser:
@@ -108,7 +108,7 @@ class EvaluatePageParser:
 
                 elif item_el_type == "item":
                     item_full_info = item_el("option").text()
-                    item = Item(
+                    item = ItemData(
                         family_id=family_id,
                         family_name=family_name,
                         group_name=group_name,

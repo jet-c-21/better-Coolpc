@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, model_validator
 
 
-class Item(BaseModel):
+class ItemData(BaseModel):
     family_id: int
     family_name: str
     group_name: str
@@ -16,7 +16,7 @@ class Item(BaseModel):
     item_notes: List[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def extract_fields_from_full_info(self) -> "Item":
+    def extract_fields_from_full_info(self) -> "ItemData":
         self.item_brand = self._extract_brand_from_full_info()
         self.item_price = self._extract_price_from_full_info()
         return self
@@ -38,7 +38,7 @@ class Item(BaseModel):
 
 
 if __name__ == "__main__":
-    item = Item(
+    item = ItemData(
         family_id=21,
         family_name="音效卡｜電視卡(盒)｜影音",
         group_name="影像擷取卡/盒/器",

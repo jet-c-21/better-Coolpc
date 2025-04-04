@@ -1,0 +1,65 @@
+# >>>>>> Project Ruff Settings (version: 0.0.1) >>>>>>
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py37" # ruff does not support Python 3.6
+
+[tool.ruff.format]
+docstring-code-line-length = 60
+docstring-code-format = true
+indent-style = "space"
+quote-style = "double"
+line-ending = "lf" # Use `\n` line endings for all files
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F", # pyflakes
+    "D213", # multi-line-summary-second-line
+    "B", # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "TCH", # flake8-type-checking
+    "Q", # flake8-quotes
+    "SIM", # flake8-simplify
+    "PTH", # flake8-use-pathlib
+    "ICN", # flake8-import-conventions
+    "LOG", # flake8-logging
+    "G", # flake8-logging-format
+    "INP", # flake8-no-pep420
+    "PIE", # flake8-pie
+    "PT", # flake8-pytest-style
+    "RSE", # flake8-raise
+    "RET", # flake8-return
+    "N", # pep8-naming
+    "PL", # pylint
+    "I", # isort
+    "UP", # pyupgrade
+    "FAST", # FastAPI
+    "RUF"   # Ruff-specific rules
+]
+
+ignore = [
+    "E402", # module-import-not-at-top-of-file
+    "INP001", # implicit-namespace-package
+    "N812", # lowercase-imported-as-non-lowercase
+    "PLR0912", # too-many-branches
+    "PLR0913", # too-many-arguments
+    "PLR0915", # too-many-statements
+    "PLR5501", # collapsible-else-if
+    "RET502", # implicit-return-value
+    "RET503", # implicit-return
+    "RET504", # unnecessary-assign
+    "RET505", # superfluous-else-return
+    "RET506", # superfluous-else-raise
+    "RET508", # superfluous-else-break
+    "SIM102", # collapsible-if
+    "SIM103", # needless-bool
+    "SIM108", # if-else-block-instead-of-if-exp
+]
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "double"
+docstring-quotes = "double"
+multiline-quotes = "double"
+# <<<<<<<<<<<<<< Project Ruff Settings <<<<<<<<<<<<<<
