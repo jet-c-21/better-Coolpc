@@ -23,7 +23,7 @@ from pycoolpc.evaluate_page import EvaluatePageParser
 if __name__ == "__main__":
     epp = EvaluatePageParser()
     data = epp.get_data(
-        specific_family_id=9,
+        specific_family_id=8,
     )
 
     data_json_path = output_dir / "coolpc-data.json"
