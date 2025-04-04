@@ -6,9 +6,10 @@ Create Date: 2025-04-04
 
 import datetime
 import re
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import requests
+from charset_normalizer import from_bytes
 from pyquery import PyQuery
 from pyquery import PyQuery as pq
 
@@ -31,9 +32,15 @@ class EvaluatePageParser:
         If no URL is provided, use the default EVALUATE_PAGE_URL.
         """
 
+        # response = requests.get(url)
+        # response.encoding = "big5"
+        # html = response.text
+
         response = requests.get(url)
-        response.encoding = "big5"
-        html = response.text
+
+        # Detect and decode with correct charset
+        detected = from_bytes(response.content).best()
+        html = detected._string  # This is a Unicode str decoded from Big5 or whatever was detected
 
         return pq(html)
 
@@ -62,42 +69,60 @@ class EvaluatePageParser:
 
         return datetime.datetime.strptime(match.group(0), "%Y/%m/%d %H:%M")
 
-    def get_data(self):
+    def get_data(self, specific_family_id: Optional[int] = None) -> Dict:
         """
 
         what will the professinal developer desing the result structure for the page data?
 
         :return:
         """
-        result = {}
-
         doc = self.get_doc(self.url)
         main_table_header = doc("tr#thy")
         _up_datetime_str = main_table_header("font#Mdy").text().strip()
         updated_datetime = self.get_updated_datetime(_up_datetime_str)
+        result = {
+            "updated_datetime": updated_datetime.isoformat(),
+            "families": [],
+        }
 
         main_table = doc("tbody#tbdy")
         for row in main_table("tr").items():
             family_id = row("td.w").text()
             family_name = row("td.t").text()
-            if not family_name:
+            if family_name == "":
                 continue
 
-            if not family_id:
+            if family_id == "":
                 continue
 
             family_id = int(family_id)
 
-            # # !@# for debug
-            # if family_id != 21:
-            #     continue
+            if specific_family_id is not None:
+                if family_id != specific_family_id:
+                    continue
 
-            groups_in_family = row("td[nowrap] > select > optgroup").items()
-            self._parse_family_el(family_id, family_name, groups_in_family)
+            group_select_el_in_family = row("td[nowrap] > select")
+            _parsed_groups = self._parse_family_el(family_id, family_name, group_select_el_in_family)
 
-    def _parse_family_el(self, family_id: int, family_name: str, groups_in_family: PyQuery) -> Dict:
-        group_to_items = {}
-        for group in groups_in_family:
+            family_dict = {
+                "family_id": family_id,
+                "family_name": family_name,
+                "groups": _parsed_groups,
+            }
+
+            result["families"].append(family_dict)
+
+        return result
+
+    def _parse_family_el(
+        self,
+        family_id: int,
+        family_name: str,
+        groups_in_family: PyQuery,
+        convert_item_data_to_dict=True,
+    ) -> List[Dict]:
+        group_ls = []
+        for group in groups_in_family("optgroup").items():
             group_name = group.attr("label")
             category_name = None
             item_ls = []
@@ -124,11 +149,21 @@ class EvaluatePageParser:
                 else:
                     raise Exception(f"Unknown item type: {item_el_type}")
 
-            group_to_items[group_name] = item_ls
+            group_dict = {
+                "group_name": group_name,
+                "items": item_ls,
+            }
 
-        return group_to_items
+            if convert_item_data_to_dict:
+                # Convert ItemData objects to dictionaries
+                group_dict["items"] = [item.model_dump() for item in item_ls]
+
+            group_ls.append(group_dict)
+
+        return group_ls
 
 
 if __name__ == "__main__":
     parser = EvaluatePageParser()
-    items = parser.get_data()
+    data = parser.get_data()
+    # print(data)
